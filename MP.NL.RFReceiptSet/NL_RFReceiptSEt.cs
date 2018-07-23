@@ -8,6 +8,9 @@ using Mantis.LVision.RFApi;
 using Mantis.LVision.RFProduct;
 using Mantis.LVision.RFReceipt;
 using System.Globalization;
+using Mantis.LVision.DBAccess.DbRoutines;
+using Mantis.LVision.Interfaces;
+
 
 namespace MP.NL.RFReceiptSet
 {
@@ -66,6 +69,7 @@ namespace MP.NL.RFReceiptSet
 
 	public class RFProduct_frmGetProduct : IFormExit
 	{
+		public System.Data.IDbConnection con ;
 		private frmGetProduct m_Form;
 		private frmReceipt m_Parent;
 		public int ProductID = 0;
@@ -78,36 +82,58 @@ namespace MP.NL.RFReceiptSet
 
 		public void txtProduct_Validating(object sender, OnValidationEventArgs e)
 		{
-			string IA_SetID, IA_SetValue, strSQL;
+			string IA_SetID, IA_SetValue, strSQL, RFFolder, XMLFormPath,ProductCode ;
 			CMenuTools RFtools = new CMenuTools();
-			Mantis.LVision.DBAccess.DbRoutines.Routines dbr = new Mantis.LVision.DBAccess.DbRoutines.Routines();
+				Mantis.LVision.DBAccess.DbRoutines.Routines dbr = new Mantis.LVision.DBAccess.DbRoutines.Routines();
 			try
 			{
-				ProductID = m_Form.txtProduct.ProductID;
-
-				if (ProductID > 0 && ReceiptCode != "")
+				/*check if there are parameters*/
+				if (m_Form.Parameters.Count > 0 || m_Form.Parameters != null)
 				{
-					strSQL = "SELECT LPA.pat_ID FROM dbo.LV_ProductAttributes LPA WHERE LPA.pat_Code='SET';";
-					IA_SetID = dbr.SelectSingleValue(strSQL, m_Form).ToString();
-					strSQL = "Select LPAV.pav_Value FROM dbo.LV_ProductAttributesValues LPAV WHERE LPAV.pav_ProductID=" + ProductID + " And  LPAV.pav_attributeID=" + IA_SetID + " ;";
-					IA_SetValue = dbr.SelectSingleValue(strSQL, m_Form).ToString();
-					/*only if IA_SetValue is equal ? then ask user for change*/
-					if (IA_SetValue == "?")
+					/*get RFFolder path*/
+					RFFolder = m_Form.Parameters.get_ItemString("RFFolder");
+
+					ProductID = m_Form.txtProduct.ProductID;
+					ProductCode = m_Form.txtProduct.ProductCode;
+					if (ProductID > 0 && ReceiptCode != "")
 					{
-						/* RFmsg = "Produtk obecnie ma ustawiony atrybut SET na: " + IA_SetValue.ToString();
-						RF_Message(RFmsg);*/
-						/*call RF form from XML*/
-						CMenuTools.ShowFormFile(m_Form, "Set26IASet.xml");
+						strSQL = "SELECT LPA.pat_ID FROM dbo.LV_ProductAttributes LPA WHERE LPA.pat_Code='SET';";
+						object queryReturnValue = dbr.SelectSingleValue(strSQL, m_Form);
+						if (queryReturnValue!=null)
+						{ IA_SetID = queryReturnValue.ToString(); 
+						strSQL = "Select LPAV.pav_Value FROM dbo.LV_ProductAttributesValues LPAV WHERE LPAV.pav_ProductID=" + ProductID + " And  LPAV.pav_attributeID=" + IA_SetID + " ;";
+						object queryReturnedValue=dbr.SelectSingleValue(strSQL, m_Form);
+							if (queryReturnedValue != null)
+							{
+								IA_SetValue = queryReturnedValue.ToString();
+							}
+							else { IA_SetValue = null; }
+							/*only if IA_SetValue is equal ? then ask user for change*/
+							if (IA_SetValue == null)
+							{
+								/* RFmsg = "Produtk obecnie ma ustawiony atrybut SET na: " + IA_SetValue.ToString();
+								RF_Message(RFmsg);*/
+								/*Setup item hierarhy and IA*/
+								strSQL = "exec usp_SetItemSetup  @prdCode='" + ProductCode + "';";
+								int execReturnedValue = dbr.Execute(strSQL, con, null, m_Form);
+							}
+							
+							/*set xml form path*/
+							XMLFormPath = RFFolder + "\\SET\\Set26IASet.xml";
+							/*call RF form from XML*/
+							CMenuTools.ShowFormFile(m_Form, XMLFormPath);
 
+						}
 					}
-
 				}
 			}
+		
 			catch (InvalidCastException ex)
 			{
 				m_Form.Rf.DisplayError(ex);
 			}
 		}
+	
 
 
 		public void Initialize(RFForm args)
@@ -117,7 +143,7 @@ namespace MP.NL.RFReceiptSet
 				return;
 			this.m_Form = (frmGetProduct)args;
 			this.m_Parent = (frmReceipt)args.Parent;
-
+			this.con = DBConnection.Open(m_Form);
 			if (this.m_Form.Parent != null && string.Compare(this.m_Form.Parent.GetType().ToString().ToLower(invariantCulture), "Mantis.LVision.rfReceipt.frmReceipt".ToLower(invariantCulture), false) == 0)
 			{
 				//this.m_bReadOnlyMultiplier = true;
