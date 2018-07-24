@@ -32,7 +32,8 @@ namespace MP.NL.RFReceiptSet
 				return;
 			m_EmptyForm = (Forms.frmEmpty)args;
 			/*only if current form i Set27IAUpdate.xml*/
-			if (m_EmptyForm.FormFile != null && string.Compare(m_EmptyForm.FormFile.ToString().ToLower(invariantCulture), "Set27IAUpdate.xml".ToLower(invariantCulture), false) == 0)
+			if (m_EmptyForm.FormFile != null /*&& string.Compare(m_EmptyForm.FormFile.ToString(), "Set27IAUpdate.xml", true) == 0*/
+				&& m_EmptyForm.FormFile.ToString().ToLower(invariantCulture).EndsWith("Set27IAUpdate.xml".ToLower(invariantCulture)))
 			{
 				{
 					/*only if we have parent of parent and it is frmGetProduct: Set27IAUpdate->Set26IASet->frmGetProduct*/
@@ -74,7 +75,7 @@ namespace MP.NL.RFReceiptSet
 		private frmReceipt m_Parent;
 		public int ProductID = 0;
 		private string ReceiptCode = "";
-
+		private bool m_bReadOnlyMultiplier;
 
 		public RFProduct_frmGetProduct()
 		{
@@ -108,7 +109,8 @@ namespace MP.NL.RFReceiptSet
 								IA_SetValue = queryReturnedValue.ToString();
 							}
 							else { IA_SetValue = null; }
-							/*only if IA_SetValue is equal ? then ask user for change*/
+							/*only if IA_SetValue is equal ? then ask user for change
+							 if is null then create IA then ask user */
 							if (IA_SetValue == null)
 							{
 								/*Setup item hierarhy and IA*/
@@ -116,11 +118,14 @@ namespace MP.NL.RFReceiptSet
 								int execReturnedValue = dbr.Execute(strSQL, con, null, m_Form);
 							}
 							
-							/*set xml form path*/
-							XMLFormPath = RFFolder + "\\SET\\Set26IASet.xml";
-							/*call RF form from XML*/
-							CMenuTools.ShowFormFile(m_Form, XMLFormPath);
-
+							if (IA_SetValue == null || IA_SetValue == "?")
+							{
+								/*set xml form path*/
+								XMLFormPath = RFFolder + "\\SET\\Set26IASet.xml";
+								/*call RF form from XML*/
+								CMenuTools.ShowFormFile(m_Form, XMLFormPath);
+							}
+							
 						}
 					}
 				}
@@ -144,20 +149,22 @@ namespace MP.NL.RFReceiptSet
 			this.con = DBConnection.Open(m_Form);
 			if (this.m_Form.Parent != null && string.Compare(this.m_Form.Parent.GetType().ToString().ToLower(invariantCulture), "Mantis.LVision.rfReceipt.frmReceipt".ToLower(invariantCulture), false) == 0)
 			{
-				//this.m_bReadOnlyMultiplier = true;
+				
 				ReceiptCode = m_Parent.txtReceiptCode.Value.ToString();
 				this.m_Form.txtProduct.Validating += new OnValidationEventHandler(this.txtProduct_Validating);
-				//this.m_Form.txtMultiplier.Enter += new OnEnterEventHandler(this.txtMultiplier_Enter);
+
+				this.m_bReadOnlyMultiplier = true;
+				this.m_Form.txtMultiplier.Enter += new OnEnterEventHandler(this.txtMultiplier_Enter);
 			}
 		}
 
 		/*NL oryginal dll content*/
-		//public void txtMultiplier_Enter(object sender, OnEnterEventArgs e)
-		//{
-		//	if (!this.m_bReadOnlyMultiplier)
-		//		return;
-		//	this.m_Form.txtMultiplier.ReadOnly = true;
-		//}
+		public void txtMultiplier_Enter(object sender, OnEnterEventArgs e)
+		{
+			if (!this.m_bReadOnlyMultiplier)
+				return;
+			this.m_Form.txtMultiplier.ReadOnly = true;
+		}
 
 
 

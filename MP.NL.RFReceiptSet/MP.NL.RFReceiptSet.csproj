@@ -77,6 +77,10 @@
       <HintPath>..\..\..\..\..\..\LV3_32\Mantis.LVision.Interfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Mantis.LVision.Proxy, Version=3.2015.1.40, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\LV3_32\Mantis.LVision.Proxy.dll</HintPath>
+    </Reference>
     <Reference Include="Mantis.LVision.RFApi">
       <HintPath>..\..\..\..\..\..\LV3_32\Mantis.LVision.RFApi.dll</HintPath>
       <Private>False</Private>
@@ -84,6 +88,10 @@
     <Reference Include="Mantis.LVision.RFControls">
       <HintPath>..\..\..\..\..\..\LV3_32\Mantis.LVision.RFControls.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Mantis.LVision.RFMovements, Version=3.2015.1.40, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\LV3_32\Mantis.LVision.RFMovements.dll</HintPath>
     </Reference>
     <Reference Include="Mantis.LVision.RFProduct">
       <HintPath>..\..\..\..\..\..\LV3_32\Mantis.LVision.RFProduct.dll</HintPath>
