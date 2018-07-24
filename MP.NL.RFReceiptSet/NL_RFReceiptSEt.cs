@@ -111,8 +111,6 @@ namespace MP.NL.RFReceiptSet
 							/*only if IA_SetValue is equal ? then ask user for change*/
 							if (IA_SetValue == null)
 							{
-								/* RFmsg = "Produtk obecnie ma ustawiony atrybut SET na: " + IA_SetValue.ToString();
-								RF_Message(RFmsg);*/
 								/*Setup item hierarhy and IA*/
 								strSQL = "exec usp_SetItemSetup  @prdCode='" + ProductCode + "';";
 								int execReturnedValue = dbr.Execute(strSQL, con, null, m_Form);

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("MP.NL.RFReceiptSet")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Mantis Polska sp. z o.o.")]
 [assembly: AssemblyProduct("MP.NL.RFReceiptSet")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2018.7.23.19")]
-[assembly: AssemblyFileVersion("2018.7.23.32030")]
+[assembly: AssemblyVersion("2018.7.24.20")]
+[assembly: AssemblyFileVersion("2018.7.24.14736")]
