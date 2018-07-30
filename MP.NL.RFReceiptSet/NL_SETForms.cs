@@ -19,7 +19,7 @@ namespace MP.NL.RFReceiptSet
 
 		public override bool Start()
 
-		{
+		{ 
 
 			string su, ipbstrResult, strSQL;
 			ipbstrResult = null;
@@ -28,7 +28,7 @@ namespace MP.NL.RFReceiptSet
 			Mantis.LVision.DBAccess.DbRoutines.Routines dbr = new Mantis.LVision.DBAccess.DbRoutines.Routines();
 
 			ds = dbr.SelectTable(strSQL, m_Form, null);
-			su = m_Form.Rf.DisplayCombo(1, 1, "Produkt: "+ProductCode+(char)13+"Typ SET: " + IA_SetValue.ToString(), "Zmiana? : ", ref ipbstrResult, ds.Tables[0], "id", "id", "rep", eEchoMode.ECHO_ON, null, true, false, "1", true);
+			su = m_Form.Rf.DisplayCombo(1, 1, "Produkt: "+Prod uctCode+(char)13+"Typ SET: " + IA_SetValue.ToString(), "Zmiana? : ", ref ipbstrResult, ds.Tables[0], "id", "id", "rep", eEchoMode.ECHO_ON, null, true, false, "1", true);
 	
 
 
