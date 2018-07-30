@@ -117,13 +117,13 @@ namespace MP.NL.RFReceiptSet
 								strSQL = "exec usp_SetItemSetup  @prdCode='" + ProductCode + "';";
 								int execReturnedValue = dbr.Execute(strSQL, con, null, m_Form);
 							}
-							
+
 							if (IA_SetValue == null || IA_SetValue == "?")
 							{
 								/*set xml form path*/
 								XMLFormPath = RFFolder + "\\SET\\Set26IASet.xml";
 								/*call RF form from XML*/
-								CMenuTools.ShowFormFile(m_Form, XMLFormPath);
+								CMenuTools.ShowFormFile(m_Form, XMLFormPath);	
 							}
 							
 						}

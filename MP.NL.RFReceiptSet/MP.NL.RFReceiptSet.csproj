@@ -80,6 +80,7 @@
     <Reference Include="Mantis.LVision.Proxy, Version=3.2015.1.40, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\LV3_32\Mantis.LVision.Proxy.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mantis.LVision.RFApi">
       <HintPath>..\..\..\..\..\..\LV3_32\Mantis.LVision.RFApi.dll</HintPath>
@@ -92,6 +93,7 @@
     <Reference Include="Mantis.LVision.RFMovements, Version=3.2015.1.40, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\LV3_32\Mantis.LVision.RFMovements.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mantis.LVision.RFProduct">
       <HintPath>..\..\..\..\..\..\LV3_32\Mantis.LVision.RFProduct.dll</HintPath>
@@ -116,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NL_RFReceiptSET.cs" />
+    <Compile Include="NL_SETForms.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
