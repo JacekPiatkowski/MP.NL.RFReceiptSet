@@ -20,17 +20,64 @@ namespace MP.NL.RFReceiptSet
 		private Forms.frmEmpty m_EmptyForm;
 		private frmGetProduct m_ParentGetProduct;
 		public int ProductID = 0;
+		Routines dbr = new Routines();
 
 		public RFTools_Forms_frmEmpty()
 		{
 		}
 
+		public void Control_C_PrdID_Validating(object sender, OnValidationEventArgs e)
+		{
+			Mantis.LVision.RFApi.RFControlText Control_C_PrdID = GetControlByName("C_PrdID");
+			if (Control_C_PrdID != null)
+			{
+				string key ="" ;
+				string ProductID = Control_C_PrdID.Value.ToString();
+
+				string strSQL = "SELECT LPA.pat_ID FROM dbo.LV_ProductAttributes LPA WHERE LPA.pat_Code='SET';";
+				object queryReturnValue = dbr.SelectSingleValue(strSQL, m_EmptyForm);
+				if (queryReturnValue != null)
+				{
+					string IA_SetID = queryReturnValue.ToString();
+					strSQL = "SELECT  LPAV.pav_Value + ' - ' + LALV.all_Value FROM dbo.LV_ProductAttributesValues LPAV  INNER JOIN dbo.LV_ProductAttributeList LPAL ON LPAL.pal_AttributeID = LPAV.pav_attributeID  AND LPAL.pal_Code = LPAV.pav_Value  INNER JOIN dbo.LV_AttributeListValue LALV ON all_PrdAttrListID = pal_ID WHERE LPAV.pav_ProductID = " + ProductID + " AND LPAV.pav_attributeID = " + IA_SetID + " AND LALV.all_LanguageID = " + this.m_EmptyForm.LanguageID.ToString() + ";";
+					object queryReturnedValue = dbr.SelectSingleValue(strSQL, m_EmptyForm);
+					if (queryReturnedValue != null)
+					{
+						string IA_SetValue = queryReturnedValue.ToString();
+						m_EmptyForm.Rf.ClearScreen();
+						/*m_EmptyForm.Rf.DisplayText("Produkt ma już  ustawiony SET:  " + IA_SetValue.ToString(), 1, 1);
+						m_EmptyForm.Rf.DisplayText("Chcesz zmienić?", 5, 1);
+						m_EmptyForm.Rf.DisplayText("1 - Tak", 7, 1);
+						m_EmptyForm.Rf.DisplayText("2 - Nie", 8, 1);
+						m_EmptyForm.Rf.ReadString(ref key);*/
+						strSQL = "select '1' id, 'TAK' rep UNION ALL  select '2' id, 'NIE' rep";
+
+						string  ipbstrResult = null;
+						m_EmptyForm.Rf.ClearScreen();
+						System.Data.DataSet ds = dbr.SelectTable(strSQL, m_EmptyForm, null);
+						key = m_EmptyForm.Rf.DisplayCombo(1, 1, "Produkt ma już  ustawiony SET:  " + IA_SetValue.ToString(), "Chcesz zmienić?:", ref ipbstrResult, ds.Tables[0], "id", "rep", null, eEchoMode.ECHO_ON, null, true, false, "1", true);
+						RFControlText combokey = GetControlByName("combokey");
+						combokey.Value = key;
+						combokey.ReadOnly = true;
+						combokey.OriginalValue = key;
+					}
+				}
+			}
+		}
+
+		/*public void Forms_frmEmpty_Validating (object sender, OnValidatingEventArgs e)
+		{
+			string any = "";
+			
+		}*/
 		public void Initialize(RFForm args)
 		{
 			CultureInfo invariantCulture = CultureInfo.InvariantCulture;
 			if (!(args is Forms.frmEmpty))
 				return;
 			m_EmptyForm = (Forms.frmEmpty)args;
+			
+
 			/*only if current form i Set27IAUpdate.xml*/
 			if (m_EmptyForm.FormFile != null /*&& string.Compare(m_EmptyForm.FormFile.ToString(), "Set27IAUpdate.xml", true) == 0*/
 				&& m_EmptyForm.FormFile.ToString().ToLower(invariantCulture).EndsWith("Set27IAUpdate.xml".ToLower(invariantCulture)))
@@ -49,6 +96,16 @@ namespace MP.NL.RFReceiptSet
 						}
 					}
 				}
+			}
+			/*if Set22IAProductSelect*/
+			if (m_EmptyForm.FormFile != null && m_EmptyForm.FormFile.ToString().ToLower(invariantCulture).EndsWith("Set22IAProductSelect.xml".ToLower(invariantCulture)))
+			{
+				RFControlText Control_C_PrdID = GetControlByName("C_PrdID");
+				if (Control_C_PrdID != null)
+				{
+					Control_C_PrdID.Validating += new OnValidationEventHandler(this.Control_C_PrdID_Validating);
+				}
+				//m_EmptyForm.Validating += new OnValidatingEventHandler(this.Forms_frmEmpty_Validating);
 			}
 		}
 		public void Close(RFForm args)
@@ -85,7 +142,7 @@ namespace MP.NL.RFReceiptSet
 		{
 			string IA_SetID, IA_SetValue, strSQL, RFFolder, XMLFormPath,ProductCode ;
 			CMenuTools RFtools = new CMenuTools();
-				Mantis.LVision.DBAccess.DbRoutines.Routines dbr = new Mantis.LVision.DBAccess.DbRoutines.Routines();
+			Routines dbr = new Routines();
 			try
 			{
 				/*check if there are parameters*/
@@ -174,4 +231,7 @@ namespace MP.NL.RFReceiptSet
 		{
 		}
 	}
+
+
+	
 }
