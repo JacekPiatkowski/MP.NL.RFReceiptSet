@@ -143,7 +143,7 @@ namespace MP.NL.RFReceiptSet
 
 		public void txtProduct_Validating(object sender, OnValidationEventArgs e)
 		{
-			string IA_SetID, IA_SetValue, strSQL, RFFolder, XMLFormPath,ProductCode ;
+			string IA_SetID, IA_SetValue, strSQL, RFFolder, XMLFormPath,ProductCode,IA_CategoryID, IA_CategoryValue ;
 			CMenuTools RFtools = new CMenuTools();
 			Routines dbr = new Routines();
 			try
@@ -158,34 +158,55 @@ namespace MP.NL.RFReceiptSet
 					ProductCode = m_Form.txtProduct.ProductCode;
 					if (ProductID > 0 && ReceiptCode != "")
 					{
-						strSQL = "SELECT LPA.pat_ID FROM dbo.LV_ProductAttributes LPA WHERE LPA.pat_Code='SET';";
+						/*check if product have category S or no category*/
+						strSQL = "SELECT LPA.pat_ID FROM dbo.LV_ProductAttributes LPA WHERE LPA.pat_Code='001';";
 						object queryReturnValue = dbr.SelectSingleValue(strSQL, m_Form);
-						if (queryReturnValue!=null)
-						{ IA_SetID = queryReturnValue.ToString(); 
-						strSQL = "Select LPAV.pav_Value FROM dbo.LV_ProductAttributesValues LPAV WHERE LPAV.pav_ProductID=" + ProductID + " And  LPAV.pav_attributeID=" + IA_SetID + " ;";
-						object queryReturnedValue=dbr.SelectSingleValue(strSQL, m_Form);
-							if (queryReturnedValue != null)
+						if (queryReturnValue != null)
+						{
+							IA_CategoryID = queryReturnValue.ToString();
+							strSQL = "Select LPAV.pav_Value FROM dbo.LV_ProductAttributesValues LPAV WHERE LPAV.pav_ProductID=" + ProductID + " And  LPAV.pav_attributeID=" + IA_CategoryID + " ;";
+							queryReturnValue = dbr.SelectSingleValue(strSQL, m_Form);
+							if (queryReturnValue != null)
 							{
-								IA_SetValue = queryReturnedValue.ToString();
+								IA_CategoryValue = queryReturnValue.ToString();
+								if (IA_CategoryValue == null || IA_CategoryValue == "S")
+								{
+									/*check IA:SET value*/
+									strSQL = "SELECT LPA.pat_ID FROM dbo.LV_ProductAttributes LPA WHERE LPA.pat_Code='SET';";
+									queryReturnValue = dbr.SelectSingleValue(strSQL, m_Form);
+									if (queryReturnValue!=null)
+									{ IA_SetID = queryReturnValue.ToString(); 
+									strSQL = "Select LPAV.pav_Value FROM dbo.LV_ProductAttributesValues LPAV WHERE LPAV.pav_ProductID=" + ProductID + " And  LPAV.pav_attributeID=" + IA_SetID + " ;";
+									object queryReturnedValue=dbr.SelectSingleValue(strSQL, m_Form);
+										if (queryReturnedValue != null)
+										{
+											IA_SetValue = queryReturnedValue.ToString();
+										}
+										else { IA_SetValue = null; }
+										/*only if IA_SetValue is equal ? then ask user for change
+										 if is null then create IA then ask user */
+										if (IA_SetValue == null)
+										{
+											/*Setup item hierarhy and IA*/
+											strSQL = "exec usp_SetItemSetup  @prdCode='" + ProductCode + "';";
+											int execReturnedValue = dbr.Execute(strSQL, con, null, m_Form);
+										}
+										if (IA_SetValue == null || IA_SetValue == "?")
+										{
+											/*set xml form path*/
+											XMLFormPath = RFFolder + "\\SET\\Set26IASet.xml";
+											/*call RF form from XML*/
+											CMenuTools.ShowFormFile(m_Form, XMLFormPath);	
+										}
+									}
+								}
+								else
+								{
+									string exception = "Można przyjąć   tylko produtky  SET!!";
+									m_Form.Rf.DisplayError(exception);
+									e.Cancel = true;
+								}
 							}
-							else { IA_SetValue = null; }
-							/*only if IA_SetValue is equal ? then ask user for change
-							 if is null then create IA then ask user */
-							if (IA_SetValue == null)
-							{
-								/*Setup item hierarhy and IA*/
-								strSQL = "exec usp_SetItemSetup  @prdCode='" + ProductCode + "';";
-								int execReturnedValue = dbr.Execute(strSQL, con, null, m_Form);
-							}
-
-							if (IA_SetValue == null || IA_SetValue == "?")
-							{
-								/*set xml form path*/
-								XMLFormPath = RFFolder + "\\SET\\Set26IASet.xml";
-								/*call RF form from XML*/
-								CMenuTools.ShowFormFile(m_Form, XMLFormPath);	
-							}
-							
 						}
 					}
 				}
