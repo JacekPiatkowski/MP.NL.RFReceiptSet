@@ -31,9 +31,10 @@ namespace MP.NL.RFReceiptSet
 			Mantis.LVision.RFApi.RFControlText Control_C_PrdID = GetControlByName("C_PrdID");
 			if (Control_C_PrdID != null)
 			{
+				RFControlText combokey = GetControlByName("combokey");
 				string key ="" ;
 				string ProductID = Control_C_PrdID.Value.ToString();
-
+				
 				string strSQL = "SELECT LPA.pat_ID FROM dbo.LV_ProductAttributes LPA WHERE LPA.pat_Code='SET';";
 				object queryReturnValue = dbr.SelectSingleValue(strSQL, m_EmptyForm);
 				if (queryReturnValue != null)
@@ -45,22 +46,24 @@ namespace MP.NL.RFReceiptSet
 					{
 						string IA_SetValue = queryReturnedValue.ToString();
 						m_EmptyForm.Rf.ClearScreen();
-						/*m_EmptyForm.Rf.DisplayText("Produkt ma już  ustawiony SET:  " + IA_SetValue.ToString(), 1, 1);
-						m_EmptyForm.Rf.DisplayText("Chcesz zmienić?", 5, 1);
-						m_EmptyForm.Rf.DisplayText("1 - Tak", 7, 1);
-						m_EmptyForm.Rf.DisplayText("2 - Nie", 8, 1);
-						m_EmptyForm.Rf.ReadString(ref key);*/
 						strSQL = "select '1' id, 'TAK' rep UNION ALL  select '2' id, 'NIE' rep";
 
 						string  ipbstrResult = null;
 						m_EmptyForm.Rf.ClearScreen();
 						System.Data.DataSet ds = dbr.SelectTable(strSQL, m_EmptyForm, null);
 						key = m_EmptyForm.Rf.DisplayCombo(1, 1, "Produkt ma już  ustawiony SET:  " + IA_SetValue.ToString(), "Chcesz zmienić?:", ref ipbstrResult, ds.Tables[0], "id", "rep", null, eEchoMode.ECHO_ON, null, true, false, "1", true);
-						RFControlText combokey = GetControlByName("combokey");
+						
 						combokey.Value = key;
 						combokey.ReadOnly = true;
 						combokey.OriginalValue = key;
 					}
+					else
+					{	/*there is no IA:SET for this item*/
+						combokey.Value = "1";
+						combokey.ReadOnly = true;
+						combokey.OriginalValue = "1";
+					}
+
 				}
 			}
 		}
